@@ -1,0 +1,252 @@
+# Sicontrola - Dark Mode Tech
+
+## Product Overview
+
+**The Pitch:** Sicontrola is a high-performance municipal fleet management control center. It centralizes vehicle tracking, fuel consumption, and maintenance scheduling into a high-contrast, data-dense command interface.
+
+**For:** Municipal fleet managers and dispatch operators who need real-time operational oversight without eye strain during long shifts.
+
+**Device:** desktop
+
+**Design Direction:** Interface escura e elegante com tons de grafite e detalhes vibrantes em verde/azul neon. Focado em monitoramento de centros de controle, com gráficos em destaque.
+
+**Inspired by:** Vercel Dashboard, Grafana control panels, Palantir Foundry.
+
+---
+
+## Screens
+
+- **Login:** Secure entry point with biometric/smartcard vibe
+- **Dashboard:** Central command center with real-time metrics and charts
+- **Veículos:** Data-dense vehicle inventory and registration grid
+- **Abastecimentos:** Fuel consumption logging and receipt tracking
+- **Manutenções:** Repair history and part replacement timeline
+
+---
+
+## Key Flows
+
+**Registering a Fuel Stop:** Fleet manager logs a new fuel receipt.
+
+1. User is on **Abastecimentos** -> sees chronological log of recent fill-ups
+2. User clicks **[+ Novo Abastecimento]** -> slide-out panel appears
+3. User enters vehicle plate, driver, fuel type, liters, and cost -> clicks **[Registrar]**
+4. Success toast appears, dashboard charts update instantly
+
+---
+
+<details>
+<summary>Design System</summary>
+
+## Color Palette
+
+- **Primary:** `#00F0FF` - Neon Cyan (Active states, main CTAs)
+- **Background:** `#0A0A0C` - Deep Obsidian (Page background)
+- **Surface:** `#16161A` - Graphite (Cards, modals, sidebar)
+- **Text:** `#E4E4E7` - Off-white (Body text)
+- **Muted:** `#71717A` - Slate (Secondary text, table borders)
+- **Accent 1:** `#00E599` - Neon Green (Success, positive trends)
+- **Accent 2:** `#FF3366` - Neon Crimson (Alerts, pending fines, errors)
+
+## Typography
+
+- **Headings:** Space Grotesk, 700, 24-32px, tracking -0.02em
+- **Body:** Outfit, 400, 15px
+- **Data/Numbers:** JetBrains Mono, 500, 14px (Used for plates, km, currency)
+- **Small text:** Outfit, 400, 13px
+- **Buttons:** Space Grotesk, 600, 14px, uppercase
+
+**Style notes:** 4px border radius everywhere. Sharp, precise geometry. Hover states feature subtle `0 0 12px` neon glow shadows. Borders are 1px solid `#27272A`.
+
+## Design Tokens
+
+```css
+:root {
+  --color-primary: #00F0FF;
+  --color-background: #0A0A0C;
+  --color-surface: #16161A;
+  --color-surface-hover: #27272A;
+  --color-text: #E4E4E7;
+  --color-muted: #71717A;
+  --color-success: #00E599;
+  --color-danger: #FF3366;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+```
+
+</details>
+
+---
+
+<details>
+<summary>Screen Specifications</summary>
+
+### Login
+
+**Purpose:** Secure gateway to the platform
+
+**Layout:** Centered login card, dark background with subtle radial gradient behind the card.
+
+**Key Elements:**
+- **Logo:** `Sicontrola`, Space Grotesk, 32px, `#00F0FF`
+- **Inputs (CPF/Senha):** `48px` height, `#0A0A0C` background, `#27272A` border, focus state glows `#00F0FF`
+- **Submit Button:** `48px` height, full width, `#00F0FF` background, `#0A0A0C` text, uppercase
+
+**States:**
+- **Empty:** Placeholder text `000.000.000-00` and `••••••••`
+- **Loading:** Submit button text replaces with glowing spinner
+- **Error:** Input border changes to `#FF3366`, 13px error text below input
+
+**Components:**
+- **LoginCard:** `400px` width, `padding 32px`, `#16161A` background
+
+**Interactions:**
+- **Hover Button:** `box-shadow: 0 0 15px rgba(0, 240, 255, 0.4)`
+- **Click Submit:** Route to Dashboard
+
+**Responsive:**
+- **Desktop:** Centered 400px card
+- **Tablet:** Same
+- **Mobile:** 100vw card, no outer margins
+
+### Dashboard
+
+**Purpose:** Command center for fleet operations
+
+**Layout:** Sidebar left (240px), Main content area with top stat cards row, middle chart section, bottom alerts list.
+
+**Key Elements:**
+- **Sidebar Menu:** Lists all areas. Active item has left border `4px solid #00F0FF` and `#27272A` background.
+- **Stat Cards (Top):** 5 cards (Veículos Ativos, Manutenções, Abastecimentos/mês, Multas Pendentes, Alertas). `16px` padding, JetBrains Mono for numbers.
+- **Consumption Chart:** Line chart showing liters over time, separated by fuel type (Gasolina, Aditivada, Diesel, Diesel S10).
+- **Alerts Table:** List of vehicles needing periodic maintenance.
+
+**States:**
+- **Empty:** "Sem dados suficientes para o período" in charts
+- **Loading:** Pulse skeleton `#27272A` over cards and charts
+- **Error:** Red toast notification top right
+
+**Components:**
+- **Sidebar:** `240px` width, fixed left, `#16161A`
+- **StatCard:** `min-width: 200px`, `#16161A`, top border `2px solid #00E599` (or red for Fines)
+
+**Interactions:**
+- **Hover Chart Point:** Tooltip showing exact liters and cost
+- **Click Alert Row:** Opens maintenance slide-out for that vehicle
+
+**Responsive:**
+- **Desktop:** 5-column card grid, 2-column chart/alerts split
+- **Tablet:** 3-column card grid, stacked charts
+- **Mobile:** Hidden sidebar (hamburger), 1-column card grid
+
+### Veículos
+
+**Purpose:** Vehicle inventory management
+
+**Layout:** Sidebar left, top action bar (Search, Filter, [+ Novo Veículo]), large data table below.
+
+**Key Elements:**
+- **Data Table:** Columns for Placa (JetBrains Mono), Marca/Modelo, Secretaria, KM, Status.
+- **Search Bar:** `300px` width, `#16161A` background, search icon left.
+- **Primary CTA:** `[+ Novo Veículo]`, top right, `#00F0FF` background.
+
+**States:**
+- **Empty:** Empty state graphic, "Nenhum veículo cadastrado"
+- **Loading:** Table rows show skeleton loader
+- **Error:** "Falha ao carregar veículos" inline message
+
+**Components:**
+- **DataRow:** `48px` height, bottom border `1px solid #27272A`
+- **StatusBadge:** `24px` height, `#00E599` text on `rgba(0, 229, 153, 0.1)` background for "Ativo"
+
+**Interactions:**
+- **Hover Row:** Background changes to `#27272A`, cursor pointer
+- **Click Row:** Opens detailed vehicle profile modal
+
+**Responsive:**
+- **Desktop:** Full table visible
+- **Tablet:** Hide 'Chassi' and 'Renavam' columns
+- **Mobile:** Card-based list instead of table
+
+### Abastecimentos
+
+**Purpose:** Track fuel consumption and expenses
+
+**Layout:** Sidebar left, split view: left side is a chronological feed of fueling events, right side is the input form.
+
+**Key Elements:**
+- **Fuel Feed:** Vertical timeline of events. Shows Plate, Liters, Valor total, Posto.
+- **Input Form:** Sticky right sidebar. Selects for Veículo, Motorista, Combustível. Inputs for Data, Posto, Litros, Valor, KM.
+- **KM Input:** Validates against previous KM to prevent lower numbers.
+
+**States:**
+- **Empty:** "Nenhum abastecimento registrado hoje"
+- **Loading:** Spinner on "Registrar" button during submission
+- **Error:** Invalid KM highlights input border `#FF3366`
+
+**Components:**
+- **TimelineItem:** `border-left: 2px solid #27272A`, circle marker `#00F0FF`
+- **FormPanel:** `360px` width, `#16161A` background, right-aligned
+
+**Interactions:**
+- **Type in Veículo:** Auto-suggests plates
+- **Click Registrar:** Appends to feed, clears form, updates dashboard stats
+
+**Responsive:**
+- **Desktop:** Split view (60% feed, 40% form)
+- **Tablet:** Form moves to modal triggered by FAB
+- **Mobile:** Stacked view, form in modal
+
+### Manutenções
+
+**Purpose:** Record and schedule repairs
+
+**Layout:** Sidebar left, Kanban-style board (Agendada, Em Andamento, Concluída).
+
+**Key Elements:**
+- **Board Columns:** `#0A0A0C` background, 3 columns.
+- **Task Cards:** Shows Veículo, Tipo (Preventiva/Corretiva), Data, Responsável.
+- **Type Badge:** Preventiva = `#00F0FF`, Corretiva = `#FF3366`.
+
+**States:**
+- **Empty:** "Nenhuma manutenção nesta coluna"
+- **Loading:** Board fades in with staggered opacity
+- **Error:** Drag-and-drop fails, card snaps back
+
+**Components:**
+- **TaskCard:** `padding: 16px`, `#16161A` background, `border: 1px solid #27272A`
+- **AddButton:** `100%` width, dashed border `#27272A` at bottom of column
+
+**Interactions:**
+- **Drag Card:** Changes column, updates status in DB
+- **Click AddButton:** Opens Maintenance form (Veículo, Tipo, Peça, etc.)
+
+**Responsive:**
+- **Desktop:** 3 columns side-by-side
+- **Tablet:** Horizontal scroll for columns
+- **Mobile:** Vertical stack of collapsible accordions
+
+</details>
+
+---
+
+<details>
+<summary>Build Guide</summary>
+
+**Stack:** HTML + Tailwind CSS v3
+
+**Build Order:**
+1. **Login:** Establishes base typography, colors, and button components.
+2. **Dashboard:** Builds the complex layout skeleton (sidebar + main), establishes card components and chart containers.
+3. **Veículos:** Creates the standard data table and search/filter patterns used across the app.
+4. **Abastecimentos:** Introduces form inputs, validation UI, and split-pane layout.
+5. **Manutenções:** Implements drag-and-drop kanban UI and advanced card states.
+
+</details>
