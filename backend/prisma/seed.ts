@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
+import { hashPassword } from 'better-auth/crypto';
 
 const prisma = new PrismaClient();
 
@@ -10,31 +10,61 @@ async function main() {
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    console.log('Admin user already exists, skipping seed.');
+    const existingAccount = await prisma.account.findUnique({
+      where: {
+        providerId_accountId: {
+          providerId: 'credential',
+          accountId: email,
+        },
+      },
+    });
+
+    if (existingAccount?.password) {
+      console.log('Admin user and credential already exist, skipping seed.');
+      return;
+    }
+
+    // User exists but missing credential - fix it
+    const hashedPassword = await hashPassword(password);
+    await prisma.account.upsert({
+      where: {
+        providerId_accountId: {
+          providerId: 'credential',
+          accountId: email,
+        },
+      },
+      update: { password: hashedPassword },
+      create: {
+        providerId: 'credential',
+        accountId: email,
+        type: 'credential',
+        password: hashedPassword,
+        userId: existingUser.id,
+      },
+    });
+    console.log('Credential account repaired for existing admin user.');
     return;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name,
       email,
- emailVerified: true,
+      emailVerified: true,
+      accounts: {
+        create: {
+          providerId: 'credential',
+          accountId: email,
+          type: 'credential',
+          password: hashedPassword,
+        },
+      },
     },
   });
 
- await prisma.account.create({
-    data: {
-      provider: 'credential',
-      providerAccountId: email,
-      type: 'credential',
-      password: hashedPassword,
-      userId: user.id,
-    },
-  });
-
-  console.log('Admin user created successfully.');
+  console.log(`Admin user created successfully: ${email}`);
 }
 
 main()

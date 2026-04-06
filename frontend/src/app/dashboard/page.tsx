@@ -29,7 +29,7 @@ export default function DashboardPage() {
   const theme = useTheme();
 
   const kpis = [
-    { title: 'Veículos Ativos', value: '124', icon: <DirectionsCar />, color: 'primary.main', trend: 'Total', secondaryIcon: <CheckCircle sx={{ fontSize: 14, color: 'success.main' }} /> },
+    { title: 'Veículos Ativos', value: '124', icon: <DirectionsCar />, color: theme.palette.primary.main, trend: 'Total', secondaryIcon: <CheckCircle sx={{ fontSize: 14, color: 'success.main' }} /> },
     { title: 'Manut. em Andamento', value: '18', icon: <Engineering />, color: '#ff9800', trend: 'OS Abertas', secondaryIcon: <Warning sx={{ fontSize: 14, color: 'warning.main' }} /> },
     { title: 'Abast. no Mês', value: '342', icon: <LocalGasStation />, color: '#00ccb1', trend: 'Registros', secondaryIcon: <TrendingUp sx={{ fontSize: 14, color: 'success.main' }} /> },
     { title: 'Multas Pendentes', value: '8', icon: <Warning />, color: '#f44336', trend: 'Ações Nec.', secondaryIcon: <TrendingUp sx={{ fontSize: 14, color: 'error.main' }} /> },
