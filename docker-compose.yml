@@ -1,4 +1,5 @@
 services:
+
   database:
     image: mysql:8
     container_name: sicontrola_db
@@ -6,9 +7,14 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sicontrola
     ports:
-      - "3306:3306"
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -18,14 +24,12 @@ services:
     environment:
       - DATABASE_URL=mysql://root:root@database:3306/sicontrola
       - BETTER_AUTH_SECRET=super_secret_key_123
-      - BETTER_AUTH_URL=http://localhost:4000
+      - BETTER_AUTH_URL=http://localhost:7000
     ports:
-      - "4000:4000"
+      - "7000:4000"
     depends_on:
-      - database
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      database:
+        condition: service_healthy
 
   frontend:
     build:
@@ -33,15 +37,12 @@ services:
       dockerfile: Dockerfile
     container_name: sicontrola_web
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000
-      - BETTER_AUTH_URL=http://localhost:4000
+      - NEXT_PUBLIC_API_URL=http://localhost:7000
+      - BETTER_AUTH_URL=http://localhost:7000
     ports:
-      - "3000:3000"
+      - "7001:3000"
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
   mysql_data:
