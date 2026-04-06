@@ -24,7 +24,7 @@ services:
     environment:
       - DATABASE_URL=mysql://root:root@database:3306/sicontrola
       - BETTER_AUTH_SECRET=super_secret_key_123
-      - BETTER_AUTH_URL=http://localhost:7000
+      - BETTER_AUTH_URL=https://sicontrola.lofivora.space
     ports:
       - "7000:4000"
     depends_on:
@@ -37,8 +37,8 @@ services:
       dockerfile: Dockerfile
     container_name: sicontrola_web
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:7000
-      - BETTER_AUTH_URL=http://localhost:7000
+      - NEXT_PUBLIC_API_URL=https://sicontrola.lofivora.space
+      - BETTER_AUTH_URL=https://sicontrola.lofivora.space
     ports:
       - "7001:3000"
     depends_on:
