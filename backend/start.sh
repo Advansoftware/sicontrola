@@ -1,6 +1,6 @@
 #!/bin/sh
 
 npx prisma generate
-npx prisma db seed
+npx ts-node --transpile-only -r tsconfig-paths/register prisma/seed.ts
 
 npm run start:dev
