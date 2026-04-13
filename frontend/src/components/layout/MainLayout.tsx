@@ -97,7 +97,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const theme = useTheme();
   const { data: session, isPending } = authClient.useSession();
 
+  React.useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/');
+    }
+  }, [session, isPending, router]);
+
   const handleDrawerToggle = () => {
+
     setMobileOpen(!mobileOpen);
   };
 
