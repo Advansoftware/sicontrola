@@ -35,4 +35,4 @@ RUN chmod +x start.sh
 
 EXPOSE 4000
 
-CMD ["./start.sh"]
+ENTRYPOINT ["sh", "/app/start.sh"]
