@@ -24,6 +24,11 @@ import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import Link from 'next/link';
 
+interface ExtendedUser {
+  role?: string;
+}
+
+
 export default function RootPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -51,7 +56,8 @@ export default function RootPage() {
     }
 
     // Redirecionamento baseado no papel
-    const role = data?.user?.role;
+    const role = (data?.user as ExtendedUser)?.role;
+
     if (role === 'ALUNO') {
       router.push('/dashboard/estudante');
     } else if (role === 'MOTORISTA') {

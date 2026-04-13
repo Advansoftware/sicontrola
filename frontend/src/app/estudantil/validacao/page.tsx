@@ -180,7 +180,7 @@ export default function SecretaryValidationPage() {
         <DialogContent dividers>
           {selectedStudent && (
             <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                  <Typography variant="overline" color="primary" sx={{ fontWeight: 700 }}>Dados Pessoais</Typography>
                  <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -202,7 +202,7 @@ export default function SecretaryValidationPage() {
                  </Box>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                  <Typography variant="overline" color="primary" sx={{ fontWeight: 700 }}>Dados Acadêmicos</Typography>
                  <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -220,7 +220,7 @@ export default function SecretaryValidationPage() {
                  </Box>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="overline" color="primary" sx={{ fontWeight: 700 }}>Documentos Enviados</Typography>
                 <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -242,7 +242,7 @@ export default function SecretaryValidationPage() {
                 </Box>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                  <TextField 
                     fullWidth 
                     multiline 

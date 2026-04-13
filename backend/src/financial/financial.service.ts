@@ -19,9 +19,9 @@ export class FinancialService {
         studentId: student.id,
         amount,
         method,
-        status: 'PAGO', // Simplified for now
-        date: new Date(),
-
+        status: 'PAGO',
+        dueDate: new Date(),
+        paidDate: new Date(),
       },
     });
   }
@@ -31,7 +31,7 @@ export class FinancialService {
       where: { userId },
       include: {
         payments: {
-          orderBy: { date: 'desc' },
+          orderBy: { createdAt: 'desc' },
         },
       },
     });
@@ -46,15 +46,15 @@ export class FinancialService {
   async getGlobalStats() {
     const totalRevenue = await this.prisma.payment.aggregate({
       _sum: { amount: true },
-      where: { status: 'PAID' },
+      where: { status: 'PAGO' },
     });
 
     const pendingPayments = await this.prisma.payment.count({
-      where: { status: 'PENDING' },
+      where: { status: 'PENDENTE' },
     });
 
     return {
-      totalRevenue: totalRevenue._sum.amount || 0,
+      totalRevenue: totalRevenue._sum?.amount || 0,
       pendingPayments,
     };
   }

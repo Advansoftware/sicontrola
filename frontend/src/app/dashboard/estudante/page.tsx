@@ -16,8 +16,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Alert
 } from '@mui/material';
+
 import { 
   School, 
   CreditCard, 
@@ -89,7 +91,7 @@ export default function StudentDashboard() {
 
       <Grid container spacing={4}>
         {/* Carteirinha Digital */}
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 5 }}>
           <Paper 
             sx={{ 
               p: 0, 
@@ -167,10 +169,10 @@ export default function StudentDashboard() {
         </Grid>
 
         {/* Status e Info */}
-        <Grid item xs={12} md={7}>
+        <Grid size={{ xs: 12, md: 7 }}>
           <Grid container spacing={3}>
             {/* Status Card */}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Paper sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.common.white, 0.05) }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>Status do Cadastro</Typography>
@@ -194,7 +196,7 @@ export default function StudentDashboard() {
             </Grid>
 
             {/* Documentos Status */}
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Paper sx={{ p: 3, borderRadius: 4, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.common.white, 0.05) }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                   <CloudUpload color="primary" />
@@ -209,7 +211,7 @@ export default function StudentDashboard() {
             </Grid>
 
             {/* Plano Status */}
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Paper sx={{ p: 3, borderRadius: 4, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.common.white, 0.05) }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                   <CreditCard color="primary" />
@@ -228,7 +230,7 @@ export default function StudentDashboard() {
             </Grid>
 
             {/* Histórico Recente */}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Paper sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.common.white, 0.05) }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Uso Recente</Typography>
                 <List disablePadding>

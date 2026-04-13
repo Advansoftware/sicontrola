@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import 'multer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
+
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 

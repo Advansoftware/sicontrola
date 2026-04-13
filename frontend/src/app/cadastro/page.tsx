@@ -120,21 +120,21 @@ export default function RegisterPage() {
       case 0:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth label="Nome Completo" variant="filled" 
                 value={accountData.name} onChange={(e) => setAccountData({...accountData, name: e.target.value})}
                 slotProps={{ input: { startAdornment: <Person sx={{mr: 1, color: 'primary.main'}} /> } }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth label="E-mail" variant="filled" type="email"
                 value={accountData.email} onChange={(e) => setAccountData({...accountData, email: e.target.value})}
                 slotProps={{ input: { startAdornment: <Email sx={{mr: 1, color: 'primary.main'}} /> } }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth label="Senha" variant="filled" type="password"
                 value={accountData.password} onChange={(e) => setAccountData({...accountData, password: e.target.value})}
@@ -146,34 +146,34 @@ export default function RegisterPage() {
       case 1:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField 
                 fullWidth label="CPF" variant="filled" 
                 value={personalData.cpf} onChange={(e) => setPersonalData({...personalData, cpf: e.target.value})}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField 
                 fullWidth label="Data de Nascimento" variant="filled" type="date"
                 value={personalData.birthDate} onChange={(e) => setPersonalData({...personalData, birthDate: e.target.value})}
                 slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth label="Telefone" variant="filled" 
                 value={personalData.phone} onChange={(e) => setPersonalData({...personalData, phone: e.target.value})}
                 slotProps={{ input: { startAdornment: <Phone sx={{mr: 1, color: 'primary.main'}} /> } }}
               />
             </Grid>
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <TextField 
                 fullWidth label="Endereço" variant="filled" 
                 value={personalData.address} onChange={(e) => setPersonalData({...personalData, address: e.target.value})}
                 slotProps={{ input: { startAdornment: <Home sx={{mr: 1, color: 'primary.main'}} /> } }}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField 
                 fullWidth label="Bairro" variant="filled" 
                 value={personalData.bairro} onChange={(e) => setPersonalData({...personalData, bairro: e.target.value})}
@@ -184,7 +184,7 @@ export default function RegisterPage() {
       case 2:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth select label="Escola / Instituição" variant="filled"
                 value={academicData.schoolId} onChange={(e) => setAcademicData({...academicData, schoolId: e.target.value})}
@@ -196,13 +196,13 @@ export default function RegisterPage() {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField 
                 fullWidth label="Curso" variant="filled" 
                 value={academicData.course} onChange={(e) => setAcademicData({...academicData, course: e.target.value})}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField 
                 fullWidth select label="Período" variant="filled"
                 value={academicData.period} onChange={(e) => setAcademicData({...academicData, period: e.target.value})}
@@ -212,7 +212,7 @@ export default function RegisterPage() {
                 <MenuItem value="NOITE">Noite</MenuItem>
               </TextField>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField 
                 fullWidth select label="Plano de Uso" variant="filled"
                 value={academicData.planId} onChange={(e) => setAcademicData({...academicData, planId: e.target.value})}

@@ -23,7 +23,15 @@ import {
 } from '@mui/icons-material';
 import { authClient } from '@/lib/auth-client';
 
+interface ExtendedUser {
+  role?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
 export default function SettingsPage() {
+
   const theme = useTheme();
   const { data: session, isPending } = authClient.useSession();
 
@@ -60,8 +68,9 @@ export default function SettingsPage() {
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>{session?.user?.name || 'Usuário'}</Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-                {session?.user?.role || 'Acesso Estudantil'}
+                {(session?.user as ExtendedUser)?.role || 'Acesso Estudantil'}
               </Typography>
+
               <Button variant="outlined" fullWidth sx={{ fontWeight: 700 }}>Alterar Foto</Button>
            </Paper>
         </Grid>

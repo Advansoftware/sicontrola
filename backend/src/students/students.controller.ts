@@ -26,6 +26,7 @@ export class StudentsController {
     @User('id') userId: string,
     @Body('type') type: string,
     @UploadedFile() file: Express.Multer.File,
+
   ) {
     if (!file) {
       throw new BadRequestException('Arquivo não enviado');

@@ -43,6 +43,14 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
 
+interface ExtendedUser {
+  role?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+
 const drawerWidth = 280;
 
 interface MenuItem {
@@ -118,7 +126,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     });
   };
 
-  const userRole = session?.user?.role || 'ALUNO';
+  const userRole = (session?.user as ExtendedUser)?.role || 'ALUNO';
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>

@@ -1,5 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import 'multer';
 import { PrismaService } from '../prisma/prisma.service';
+
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import { MailService } from '../mail/mail.service';
@@ -42,7 +44,7 @@ export class StudentsService {
     });
 
     // Enviar e-mail de confirmação assincronamente
-    this.mail.sendConfirmationEmail(student.user.email, student.user.name).catch(console.error);
+    this.mail.sendConfirmationEmail(student.user.email, student.user.name ?? student.user.email).catch(console.error);
 
     return student;
   }
