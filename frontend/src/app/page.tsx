@@ -16,29 +16,49 @@ import {
   VisibilityOff, 
   DirectionsCar,
   Lock,
-  Person
+  Person,
+  School
 } from '@mui/icons-material';
-import { Grid } from '@mui/material'; // Usando a nova API de Grid do MUI v7
+import { Grid, Alert, CircularProgress } from '@mui/material'; // Usando a nova API de Grid do MUI v7
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
+import Link from 'next/link';
 
 export default function RootPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  
   const theme = useTheme();
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Tentando navegação para o dashboard...');
-    
-    // Tenta usar o router do Next.js primeiro
-    router.push('/dashboard');
-    
-    // Fallback caso o router falhe silenciosamente no ambiente
-    setTimeout(() => {
-      if (window.location.pathname !== '/dashboard') {
-        window.location.href = '/dashboard';
-      }
-    }, 500);
+    setError(null);
+    setLoading(true);
+
+    const { data, error: authError } = await authClient.signIn.email({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message || 'Falha na autenticação');
+      setLoading(false);
+      return;
+    }
+
+    // Redirecionamento baseado no papel
+    const role = data?.user?.role;
+    if (role === 'ALUNO') {
+      router.push('/dashboard/estudante');
+    } else if (role === 'MOTORISTA') {
+      router.push('/dashboard/scanner');
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   return (
@@ -97,9 +117,20 @@ export default function RootPage() {
                     SICONTROLA
                 </Typography>
              </Box>
-             <Typography variant="h5" color="textSecondary" sx={{ fontWeight: 400, maxWidth: 400, lineHeight: 1.4 }}>
-                Gestão inteligente de frotas municipais com tecnologia de ponta e interface de alta performance.
+             <Typography variant="h5" color="textSecondary" sx={{ fontWeight: 400, maxWidth: 450, lineHeight: 1.4 }}>
+                Gestão unificada de frotas municipais e <strong style={{ color: theme.palette.primary.main }}>transporte estudantil</strong> com tecnologia de ponta.
              </Typography>
+             
+             <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Paper sx={{ p: 2, bgcolor: alpha(theme.palette.common.white, 0.03), borderRadius: 3, border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <School sx={{ color: 'primary.main' }} />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>Carteirinha Digital</Typography>
+                </Paper>
+                <Paper sx={{ p: 2, bgcolor: alpha(theme.palette.common.white, 0.03), borderRadius: 3, border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <DirectionsCar sx={{ color: 'primary.main' }} />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>Controle de Frota</Typography>
+                </Paper>
+             </Box>
            </Box>
         </Grid>
 
@@ -119,14 +150,22 @@ export default function RootPage() {
             }}
           >
             <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: -1 }}>Acessar Sistema</Typography>
-            <Typography variant="body2" color="textSecondary" sx={{ mb: 5 }}>Insira suas credenciais para continuar.</Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 4 }}>Insira suas credenciais para continuar.</Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>
+            )}
 
             <form onSubmit={handleLogin}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <TextField 
                   fullWidth 
-                  label="Usuário ou E-mail" 
+                  label="E-mail" 
                   variant="filled"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  required
                   slotProps={{
                       input: {
                           disableUnderline: true,
@@ -149,6 +188,9 @@ export default function RootPage() {
                   fullWidth 
                   label="Senha" 
                   variant="filled"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   type={showPassword ? 'text' : 'password'}
                   slotProps={{
                       input: {
@@ -178,6 +220,7 @@ export default function RootPage() {
                     variant="contained" 
                     size="large" 
                     type="submit"
+                    disabled={loading}
                     sx={{ 
                         mt: 2, 
                         py: 2, 
@@ -187,13 +230,22 @@ export default function RootPage() {
                         boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}`
                     }}
                 >
-                  Entrar no Painel
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar no Painel'}
                 </Button>
 
-                <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <Typography variant="caption" color="textSecondary">
-                        Esqueceu sua senha? <Typography variant="caption" color="primary" sx={{ cursor: 'pointer', fontWeight: 600 }}>Contate o suporte</Typography>
+                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+                    <Typography variant="body2" color="textSecondary">
+                        Não tem uma conta?
                     </Typography>
+                    <Button 
+                      component={Link} 
+                      href="/cadastro" 
+                      variant="outlined" 
+                      fullWidth
+                      sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                    >
+                      Cadastrar-se como Aluno
+                    </Button>
                 </Box>
               </Box>
             </form>
@@ -203,3 +255,4 @@ export default function RootPage() {
     </Box>
   );
 }
+

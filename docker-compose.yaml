@@ -25,8 +25,18 @@ services:
       - DATABASE_URL=mysql://root:root@database:3306/sicontrola
       - BETTER_AUTH_SECRET=super_secret_key_123
       - BETTER_AUTH_URL=https://sicontrola.lofivora.space
+      - UPLOAD_DIR=/app/uploads
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=seu-email@gmail.com
+      - SMTP_PASS=sua-senha-app
+      - SMTP_FROM="Sicontrola <noreply@sicontrola.com>"
     ports:
       - "7000:4000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       database:
         condition: service_healthy
@@ -41,8 +51,13 @@ services:
       - BETTER_AUTH_URL=https://sicontrola.lofivora.space
     ports:
       - "7001:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     depends_on:
       - backend
+
 
 volumes:
   mysql_data:

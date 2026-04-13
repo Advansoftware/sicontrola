@@ -11,11 +11,23 @@ import { MaintenancesModule } from './maintenances/maintenances.module';
 import { PartsModule } from './parts/parts.module';
 import { FinesModule } from './fines/fines.module';
 import { RevisionsModule } from './revisions/revisions.module';
+import { MailModule } from './mail/mail.module';
+import { UploadsModule } from './uploads/uploads.module';
+import { StudentsModule } from './students/students.module';
+import { SecretaryModule } from './secretary/secretary.module';
+import { UsageModule } from './usage/usage.module';
+import { FinancialModule } from './financial/financial.module';
 
 @Module({
   imports: [
     PrismaModule, 
     AuthModule, 
+    MailModule,
+    UploadsModule,
+    StudentsModule,
+    SecretaryModule,
+    UsageModule,
+    FinancialModule,
     VehiclesModule, 
     DriversModule, 
     RefuelsModule, 

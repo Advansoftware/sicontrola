@@ -10,14 +10,24 @@ datasource db {
 
 // --- Better Auth Models ---
 
+enum Role {
+  ADMIN
+  SECRETARIA
+  ALUNO
+  MOTORISTA
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String    @unique
   emailVerified Boolean  @default(false)
   image         String?
+  role          Role      @default(ALUNO)
   accounts      Account[]
   sessions      Session[]
+  student       Student?
+  driver_profile Driver?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -72,7 +82,7 @@ model VerificationToken {
   @@map("verification_token")
 }
 
-// --- Sicontrola Business Models ---
+// --- Sicontrola Business Models (Fleet) ---
 
 enum VehicleType {
   CARRO
@@ -129,6 +139,8 @@ model Vehicle {
 
 model Driver {
   id            String    @id @default(cuid())
+  userId        String?   @unique
+  user          User?     @relation(fields: [userId], references: [id])
   name          String
   cnh           String    @unique
   category      String
@@ -137,6 +149,7 @@ model Driver {
   updatedAt     DateTime  @updatedAt
 
   refuels       Refuel[]
+  studentUsages StudentUsage[]
 
   @@map("driver")
 }
@@ -216,4 +229,115 @@ model Revision {
 
   @@map("revision")
 }
+
+// --- Sicontrola Student Models ---
+
+model Student {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  cpf             String   @unique
+  birthDate       DateTime
+  phone           String
+  address         String
+  bairro          String
+  schoolId        String?
+  school          School?  @relation(fields: [schoolId], references: [id])
+  course          String?
+  period          String?  // MANHA, TARDE, NOITE
+  schoolYear      String?
+  planId          String?
+  plan            Plan?    @relation(fields: [planId], references: [id])
+  status          StudentStatus @default(PENDENTE)
+  rejectionReason String?
+  documents       Document[]
+  payments        Payment[]
+  usages          StudentUsage[]
+  qrCode          String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("student")
+}
+
+enum StudentStatus {
+  PENDENTE
+  EM_ANALISE
+  APROVADO
+  REPROVADO
+  EM_CORRECAO
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  type      String   // FOTO, DECLARACAO, RESIDENCIA, RG_CPF
+  url       String
+  createdAt DateTime @default(now())
+
+  @@map("document")
+}
+
+model Plan {
+  id            String   @id @default(cuid())
+  name          String
+  price         Float
+  usesPerWeek   Int
+  students      Student[]
+
+  @@map("plan")
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  amount      Float
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      PaymentStatus @default(PENDENTE)
+  method      String? // PIX, BOLETO
+  createdAt   DateTime @default(now())
+
+  @@map("payment")
+}
+
+enum PaymentStatus {
+  PAGO
+  PENDENTE
+  ATRASADO
+}
+
+model School {
+  id       String   @id @default(cuid())
+  name     String
+  students Student[]
+
+  @@map("school")
+}
+
+model Route {
+  id            String @id @default(cuid())
+  name          String
+  origin        String
+  destination   String
+  studentUsages StudentUsage[]
+
+  @@map("route")
+}
+
+model StudentUsage {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  driverId  String
+  driver    Driver   @relation(fields: [driverId], references: [id])
+  routeId   String
+  route     Route    @relation(fields: [routeId], references: [id])
+  date      DateTime @default(now())
+
+  @@map("student_usage")
+}
+
 

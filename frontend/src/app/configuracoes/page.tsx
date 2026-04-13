@@ -13,21 +13,29 @@ import {
   Divider,
   Button,
   Avatar,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material';
-import { Grid } from '@mui/material'; // Usando a nova API de Grid do MUI v7
+import { Grid } from '@mui/material'; 
 import { 
-  Settings, 
   Notifications, 
   Security, 
-  Palette, 
-  VpnKey,
-  Translate,
-  CloudDone
 } from '@mui/icons-material';
+import { authClient } from '@/lib/auth-client';
 
 export default function SettingsPage() {
   const theme = useTheme();
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    return (
+      <MainLayout>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
+          <CircularProgress />
+        </Box>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -45,11 +53,15 @@ export default function SettingsPage() {
         <Grid size={{ xs: 12, md: 4 }}>
            <Paper sx={{ p: 4, bgcolor: alpha(theme.palette.background.paper, 0.4), backdropFilter: 'blur(10px)', border: '1px solid', borderColor: alpha(theme.palette.common.white, 0.05), borderRadius: 4, textAlign: 'center' }}>
               <Avatar 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bruno" 
-                sx={{ width: 120, height: 120, mx: 'auto', mb: 2, border: '4px solid', borderColor: 'primary.main' }} 
-              />
-              <Typography variant="h6" sx={{ fontWeight: 800 }}>Bruno Oliveira</Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>Administrador de Frota</Typography>
+                src={session?.user?.image || undefined} 
+                sx={{ width: 120, height: 120, mx: 'auto', mb: 2, border: '4px solid', borderColor: 'primary.main', bgcolor: 'primary.main', fontSize: 40 }} 
+              >
+                {session?.user?.name?.[0]}
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>{session?.user?.name || 'Usuário'}</Typography>
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+                {session?.user?.role || 'Acesso Estudantil'}
+              </Typography>
               <Button variant="outlined" fullWidth sx={{ fontWeight: 700 }}>Alterar Foto</Button>
            </Paper>
         </Grid>
@@ -64,13 +76,10 @@ export default function SettingsPage() {
                     </Box>
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <FormControlLabel control={<Switch defaultChecked />} label="Alertas de Vencimento de CNH" />
+                            <FormControlLabel control={<Switch defaultChecked />} label="Alertas de Sistema" />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                             <FormControlLabel control={<Switch defaultChecked />} label="Avisos de Manutenção Preventiva" />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                             <FormControlLabel control={<Switch defaultChecked />} label="Relatórios Semanais por E-mail" />
+                             <FormControlLabel control={<Switch defaultChecked />} label="Avisos por E-mail" />
                         </Grid>
                     </Grid>
                 </Box>
@@ -84,17 +93,17 @@ export default function SettingsPage() {
                     </Box>
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField fullWidth type="password" label="Senha Atual" size="small" />
+                            <TextField fullWidth type="password" label="Senha Atual" size="small" variant="filled" />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField fullWidth type="password" label="Nova Senha" size="small" />
+                            <TextField fullWidth type="password" label="Nova Senha" size="small" variant="filled" />
                         </Grid>
                     </Grid>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button color="inherit" sx={{ fontWeight: 700 }}>Descartar Alterações</Button>
-                    <Button variant="contained" sx={{ fontWeight: 700, px: 4 }}>Salvar Configurações</Button>
+                    <Button color="inherit" sx={{ fontWeight: 700 }}>Descartar</Button>
+                    <Button variant="contained" sx={{ fontWeight: 700, px: 4 }}>Salvar Alterações</Button>
                 </Box>
             </Paper>
         </Grid>

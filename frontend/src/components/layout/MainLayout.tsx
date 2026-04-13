@@ -35,25 +35,59 @@ import {
   Assignment,
   Assessment,
   Warning,
-  Build as BuildIcon
+  QrCodeScanner,
+  School as SchoolIcon,
+  CreditCard
 } from '@mui/icons-material';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 const drawerWidth = 280;
 
-const menuItems = [
-  { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
-  { text: 'Veículos', icon: <DirectionsCar />, path: '/veiculos' },
-  { text: 'Motoristas', icon: <Person />, path: '/motoristas' },
-  { text: 'Abastecimentos', icon: <LocalGasStation />, path: '/abastecimentos' },
-  { text: 'Manutenções', icon: <Build />, path: '/manutencoes' },
-  { text: 'Peças', icon: <Settings />, path: '/pecas' },
-  { text: 'Revisões', icon: <Today />, path: '/revisoes' },
-  { text: 'Multas', icon: <Warning />, path: '/multas' },
-  { text: 'Documentos', icon: <Assignment />, path: '/documentos' },
-  { text: 'Relatórios', icon: <Assessment />, path: '/relatorios' },
-  { text: 'Configurações', icon: <Settings />, path: '/configuracoes' },
+interface MenuItem {
+  text: string;
+  icon: React.ReactNode;
+  path: string;
+  roles?: string[];
+}
+
+const menuSections: { title?: string; items: MenuItem[] }[] = [
+  {
+    title: 'Geral',
+    items: [
+      { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard', roles: ['ADMIN', 'SECRETARIA'] },
+      { text: 'Área do Aluno', icon: <Dashboard />, path: '/dashboard/estudante', roles: ['ALUNO'] },
+      { text: 'Scanner QR', icon: <QrCodeScanner />, path: '/dashboard/scanner', roles: ['MOTORISTA', 'ADMIN'] },
+    ]
+  },
+  {
+    title: 'Gestão Estudantil',
+    items: [
+      { text: 'Validar Alunos', icon: <Assignment />, path: '/estudantil/validacao', roles: ['ADMIN', 'SECRETARIA'] },
+      { text: 'Escolas', icon: <SchoolIcon />, path: '/estudantil/escolas', roles: ['ADMIN', 'SECRETARIA'] },
+      { text: 'Planos', icon: <CreditCard />, path: '/estudantil/planos', roles: ['ADMIN', 'SECRETARIA'] },
+    ]
+  },
+  {
+    title: 'Gestão de Frota',
+    items: [
+      { text: 'Veículos', icon: <DirectionsCar />, path: '/veiculos', roles: ['ADMIN'] },
+      { text: 'Motoristas', icon: <Person />, path: '/motoristas', roles: ['ADMIN'] },
+      { text: 'Abastecimentos', icon: <LocalGasStation />, path: '/abastecimentos', roles: ['ADMIN'] },
+      { text: 'Manutenções', icon: <Build />, path: '/manutencoes', roles: ['ADMIN'] },
+      { text: 'Peças', icon: <Settings />, path: '/pecas', roles: ['ADMIN'] },
+      { text: 'Revisões', icon: <Today />, path: '/revisoes', roles: ['ADMIN'] },
+      { text: 'Multas', icon: <Warning />, path: '/multas', roles: ['ADMIN'] },
+    ]
+  },
+  {
+    title: 'Sistema',
+    items: [
+      { text: 'Relatórios', icon: <Assessment />, path: '/relatorios', roles: ['ADMIN', 'SECRETARIA'] },
+      { text: 'Configurações', icon: <Settings />, path: '/configuracoes', roles: ['ADMIN', 'SECRETARIA', 'ALUNO'] },
+    ]
+  }
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -61,10 +95,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
+  const { data: session, isPending } = authClient.useSession();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/');
+        }
+      }
+    });
+  };
+
+  const userRole = session?.user?.role || 'ALUNO';
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
@@ -88,33 +135,61 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </Typography>
       </Box>
 
-      <List sx={{ px: 2, flexGrow: 1 }}>
-        {menuItems.map((item) => {
-          const active = pathname === item.path;
+      <Box sx={{ px: 2, flexGrow: 1, overflowY: 'auto' }}>
+        {menuSections.map((section, idx) => {
+          const visibleItems = section.items.filter(item => !item.roles || item.roles.includes(userRole));
+          
+          if (visibleItems.length === 0) return null;
+
           return (
-            <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
-              <ListItemButton 
-                component={Link}
-                href={item.path}
-                sx={{ 
-                  borderRadius: 2,
-                  bgcolor: active ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
-                  color: active ? 'primary.main' : 'text.secondary',
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.04),
-                    color: 'text.primary'
-                  }
-                }}
-              >
-                <ListItemIcon sx={{ color: active ? 'primary.main' : 'inherit', minWidth: 40 }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: active ? 700 : 500 }} />
-              </ListItemButton>
-            </ListItem>
+            <React.Fragment key={idx}>
+              {section.title && (
+                <Typography 
+                  variant="overline" 
+                  sx={{ 
+                    px: 2, 
+                    mt: 3, 
+                    mb: 1, 
+                    display: 'block', 
+                    color: 'text.secondary',
+                    fontWeight: 700,
+                    opacity: 0.6
+                  }}
+                >
+                  {section.title}
+                </Typography>
+              )}
+              <List disablePadding>
+                {visibleItems.map((item) => {
+                  const active = pathname === item.path;
+                  return (
+                    <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+                      <ListItemButton 
+                        component={Link}
+                        href={item.path}
+                        sx={{ 
+                          borderRadius: 2,
+                          bgcolor: active ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                          color: active ? 'primary.main' : 'text.secondary',
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.04),
+                            color: 'text.primary'
+                          }
+                        }}
+                      >
+                        <ListItemIcon sx={{ color: active ? 'primary.main' : 'inherit', minWidth: 40 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: active ? 700 : 500, variant: 'body2' }} />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </React.Fragment>
           );
         })}
-      </List>
+      </Box>
 
       <Box sx={{ p: 2, mt: 'auto' }}>
         <Paper 
@@ -127,12 +202,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>B</Avatar>
-            <Box>
-              <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>Usuário</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>Bruno Gestor</Typography>
+            <Avatar 
+              src={session?.user?.image || undefined}
+              sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}
+            >
+              {session?.user?.name?.[0] || 'U'}
+            </Avatar>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>
+                {userRole}
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {session?.user?.name || 'Usuário'}
+              </Typography>
             </Box>
-            <IconButton size="small" sx={{ ml: 'auto' }} color="error">
+            <IconButton size="small" sx={{ ml: 'auto' }} color="error" onClick={handleLogout}>
               <Logout fontSize="small" />
             </IconButton>
           </Box>
@@ -153,7 +237,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           borderBottom: '1px solid',
           borderColor: alpha(theme.palette.common.white, 0.05),
           boxShadow: 'none',
-          color: 'text.primary'
+          color: 'text.primary',
+          zIndex: (theme) => theme.zIndex.drawer + 1
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -169,7 +254,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary', bgcolor: alpha(theme.palette.common.white, 0.03), px: 2, py: 0.5, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)' }}>
             <Search fontSize="small" />
-            <Typography variant="body2">Pesquisar frota...</Typography>
+            <Typography variant="body2">Pesquisar...</Typography>
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -178,8 +263,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <Notifications fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Divider orientation="vertical" flexItem sx={{ height: 24, alignSelf: 'center' }} />
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>Câmara Municipal</Typography>
+            {session?.user && (
+              <>
+                <Divider orientation="vertical" flexItem sx={{ height: 24, alignSelf: 'center' }} />
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{session.user.name}</Typography>
+              </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -233,3 +322,4 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     </Box>
   );
 }
+
