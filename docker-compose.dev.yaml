@@ -2,14 +2,14 @@ services:
 
   database:
     image: mysql:8
-    container_name: sicontrola_db
+    container_name: sicontrola_db_dev
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sicontrola
     ports:
       - "3308:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_dev:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -17,14 +17,15 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: sicontrola_api
+    image: node:22-alpine
+    container_name: sicontrola_api_dev
+    working_dir: /app
+    command: sh -c "apk add --no-cache openssl && npm install && npx prisma generate
+      && npx prisma db push --accept-data-loss && npm run start:dev"
     environment:
       - DATABASE_URL=mysql://root:root@database:3306/sicontrola
       - BETTER_AUTH_SECRET=super_secret_key_123
-      - BETTER_AUTH_URL=https://sicontrola.com.br
+      - BETTER_AUTH_URL=http://localhost:7000
       - UPLOAD_DIR=/app/uploads
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
@@ -34,23 +35,31 @@ services:
     ports:
       - "7000:4000"
     volumes:
-      - ./backend/uploads:/app/uploads
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
     depends_on:
       database:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: sicontrola_web
+    image: node:22-alpine
+    container_name: sicontrola_web_dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
     environment:
-      - NEXT_PUBLIC_API_URL=https://sicontrola.com.br
-      - BETTER_AUTH_URL=https://sicontrola.com.br
+      - NEXT_PUBLIC_API_URL=http://localhost:7000
+      - BETTER_AUTH_URL=http://localhost:7000
     ports:
       - "7001:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
     depends_on:
       - backend
 
 volumes:
-  mysql_data:
+  mysql_data_dev:
+  backend_node_modules:
+  frontend_node_modules:
+  frontend_next:
