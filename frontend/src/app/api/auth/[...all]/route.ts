@@ -14,6 +14,12 @@ async function proxyToBackend(request: NextRequest): Promise<NextResponse> {
   const cookie = request.headers.get('cookie')
   if (cookie) headers['cookie'] = cookie
 
+  const origin = request.headers.get('origin')
+  if (origin) headers['origin'] = origin
+
+  const referer = request.headers.get('referer')
+  if (referer) headers['referer'] = referer
+
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD'
 
   try {
