@@ -125,26 +125,10 @@ export default function LoginView() {
       });
 
       if (result.error) {
-        // Try sign-up first for auto-create
-        const signUpResult = await signUp.email({
-          email: demoEmail,
-          password: demoPassword,
-          name: demoEmail.split("@")[0],
-        });
-
-        if (signUpResult.error) {
-          setError("Nao foi possivel criar a conta de demonstracao.");
-        } else {
-          const loginResult = await signIn.email({
-            email: demoEmail,
-            password: demoPassword,
-          });
-          if (loginResult.error) {
-            setError("Erro ao fazer login. Tente novamente.");
-          } else {
-            window.location.href = "/";
-          }
-        }
+        setError(
+          result.error.message ||
+            "Credenciais invalidas. Verifique seu e-mail e senha.",
+        );
       } else {
         window.location.href = "/";
       }
