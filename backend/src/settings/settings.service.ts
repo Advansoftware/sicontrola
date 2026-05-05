@@ -64,8 +64,8 @@ export class SettingsService {
   async updateSystemSettings(data: Record<string, unknown>) {
     return this.prisma.systemSettings.upsert({
       where: { id: 'default' },
-      update: data as never,
-      create: { id: 'default', ...(data as never) },
+      update: data as Parameters<typeof this.prisma.systemSettings.update>[0]['data'],
+      create: Object.assign({ id: 'default' }, data) as Parameters<typeof this.prisma.systemSettings.create>[0]['data'],
     });
   }
 }
