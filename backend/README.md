@@ -1,6 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Sicontrola — Backend (API REST)
+
+API REST do sistema Sicontrola, construída com **NestJS 11**, **Prisma 6** e **MySQL 8**.
+
+---
+
+## Stack
+
+- **Framework**: NestJS 11 (TypeScript)
+- **ORM**: Prisma 6 (MySQL)
+- **Autenticação**: Better-Auth 1.6 (sessions via cookie, Prisma Adapter)
+- **Upload**: Multer (arquivos em `/app/uploads`)
+- **E-mail**: Nodemailer
+
+---
+
+## Módulos
+
+| Módulo        | Prefixo              | Descrição                            |
+| ------------- | -------------------- | ------------------------------------ |
+| Auth          | `/api/auth/**`       | Login, logout, session (Better-Auth) |
+| Students      | `/api/students`      | Cadastro e perfil do aluno           |
+| Secretary     | `/api/secretary`     | Validação de cadastros, dashboard    |
+| Financial     | `/api/financial`     | Planos, pagamentos, inadimplência    |
+| Usage         | `/api/usage`         | Validação de embarque (QR Code)      |
+| Drivers       | `/api/drivers`       | Motoristas e rotas                   |
+| Vehicles      | `/api/vehicles`      | Frota                                |
+| Refuels       | `/api/refuels`       | Abastecimentos                       |
+| Maintenances  | `/api/maintenances`  | Manutenções                          |
+| Parts         | `/api/parts`         | Peças                                |
+| Fines         | `/api/fines`         | Multas                               |
+| Revisions     | `/api/revisions`     | Revisões                             |
+| Settings      | `/api/settings`      | Escolas, rotas, planos, sistema      |
+| Notifications | `/api/notifications` | Notificações por usuário             |
+| Reports       | `/api/reports`       | Relatórios                           |
+| Uploads       | `/api/uploads`       | Upload de documentos                 |
+
+---
+
+## Roles
+
+| Role         | Acesso                                                      |
+| ------------ | ----------------------------------------------------------- |
+| `ADMIN`      | Total                                                       |
+| `SECRETARIA` | Alunos, financeiro, relatórios, leitura de drivers/vehicles |
+| `ALUNO`      | Próprio perfil, documentos, pagamentos                      |
+| `MOTORISTA`  | Validação de embarque, registros do dia                     |
+
+---
+
+## Variáveis de Ambiente
+
+| Variável             | Padrão                  | Descrição                  |
+| -------------------- | ----------------------- | -------------------------- |
+| `DATABASE_URL`       | —                       | String de conexão MySQL    |
+| `BETTER_AUTH_SECRET` | —                       | Chave secreta para sessões |
+| `BETTER_AUTH_URL`    | `http://localhost:4000` | URL pública desta API      |
+| `UPLOAD_DIR`         | `/app/uploads`          | Diretório de uploads       |
+| `SMTP_HOST`          | —                       | Host SMTP                  |
+| `SMTP_PORT`          | `587`                   | Porta SMTP                 |
+| `SMTP_USER`          | —                       | Usuário SMTP               |
+| `SMTP_PASS`          | —                       | Senha SMTP                 |
+| `SMTP_FROM`          | —                       | Remetente padrão           |
+
+---
+
+## Desenvolvimento local
+
+```bash
+npm install
+npm run start:dev
+```
+
+O servidor sobe na porta **4000**.
+
+> Requer MySQL rodando. Use `docker compose -f ../docker-compose.dev.yaml up database` para subir só o banco.
+
+---
+
+## Docker (produção)
+
+O `Dockerfile` faz:
+1. Build TypeScript (`npm run build`)
+2. A imagem final executa `start.sh`:
+   - `prisma db push` — sincroniza schema com o banco
+   - Seed do usuário admin (`admin@sicontrola.com` / `Admin123!`) se não existir
+   - `node dist/src/main` — inicia o servidor
+
+---
+
+## Schema do banco
+
+Arquivo: `prisma/schema.prisma`
+
+Modelos principais: `User`, `Student`, `Driver`, `Vehicle`, `Route`, `School`, `Plan`, `Payment`, `StudentUsage`, `Notification`, `SystemSettings`, e modelos de frota (`Refuel`, `Maintenance`, `Part`, `Fine`, `Revision`).
+
+Para atualizar o banco após mudanças no schema:
+```bash
+npx prisma db push
+```
+
+---
+
+## Testes
+
+```bash
+npm run test          # unitários
+npm run test:e2e      # end-to-end
+npm run test:cov      # cobertura
+```
+
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest

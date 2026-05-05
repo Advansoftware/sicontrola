@@ -17,26 +17,33 @@ import { StudentsModule } from './students/students.module';
 import { SecretaryModule } from './secretary/secretary.module';
 import { UsageModule } from './usage/usage.module';
 import { FinancialModule } from './financial/financial.module';
+import { SettingsModule } from './settings/settings.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
-    PrismaModule, 
-    AuthModule, 
+    PrismaModule,
+    AuthModule,
     MailModule,
     UploadsModule,
     StudentsModule,
     SecretaryModule,
     UsageModule,
     FinancialModule,
-    VehiclesModule, 
-    DriversModule, 
-    RefuelsModule, 
-    MaintenancesModule, 
+    SettingsModule,
+    NotificationsModule,
+    ReportsModule,
+    VehiclesModule,
+    DriversModule,
+    RefuelsModule,
+    MaintenancesModule,
     PartsModule,
     FinesModule,
-    RevisionsModule
+    RevisionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
+

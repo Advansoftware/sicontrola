@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { SecretaryService } from './secretary.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -9,20 +9,30 @@ import { StudentStatus } from '@prisma/client';
 @UseGuards(AuthGuard, RolesGuard)
 @Roles('ADMIN', 'SECRETARIA')
 export class SecretaryController {
-  constructor(private readonly secretaryService: SecretaryService) {}
+  constructor(private readonly secretaryService: SecretaryService) { }
 
+  /** Listar alunos com filtro opcional por status e busca */
+  @Get('students')
+  findStudents(
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.secretaryService.findStudents(status, search);
+  }
+
+  /** Mantido por compatibilidade — retorna pendentes/análise/correção */
   @Get('students/pending')
   findPending() {
-    return this.secretaryService.findPendingStudents();
+    return this.secretaryService.findStudents('pending');
   }
 
   @Patch('students/:id/status')
   updateStatus(
     @Param('id') id: string,
     @Body('status') status: StudentStatus,
-    @Body('rejectionReason') rejectionReason?: string,
+    @Body('reason') reason?: string,
   ) {
-    return this.secretaryService.updateStatus(id, status, rejectionReason);
+    return this.secretaryService.updateStatus(id, status, reason);
   }
 
   @Get('dashboard/stats')
@@ -30,3 +40,4 @@ export class SecretaryController {
     return this.secretaryService.getDashboardStats();
   }
 }
+

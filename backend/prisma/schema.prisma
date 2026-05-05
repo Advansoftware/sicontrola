@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  engineType    = "library"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -18,36 +18,37 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified Boolean  @default(false)
-  image         String?
-  role          Role      @default(ALUNO)
-  accounts      Account[]
-  sessions      Session[]
-  student       Student?
+  id             String         @id @default(cuid())
+  name           String?
+  email          String         @unique
+  emailVerified  Boolean        @default(false)
+  image          String?
+  role           Role           @default(ALUNO)
+  accounts       Account[]
+  sessions       Session[]
+  student        Student?
   driver_profile Driver?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  notifications  Notification[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@map("user")
 }
 
 model Account {
-  id                    String    @id @default(cuid())
-  userId                String
-  type                  String
-  providerId            String    @map("provider")
-  accountId             String    @map("providerAccountId")
-  password              String?   @db.Text
-  refreshToken          String?   @map("refresh_token") @db.Text
-  accessToken           String?   @map("access_token") @db.Text
-  accessTokenExpiresAt  Int?      @map("expires_at")
-  scope                 String?
-  idToken               String?   @map("id_token") @db.Text
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String
+  type                 String
+  providerId           String   @map("provider")
+  accountId            String   @map("providerAccountId")
+  password             String?  @db.Text
+  refreshToken         String?  @map("refresh_token") @db.Text
+  accessToken          String?  @map("access_token") @db.Text
+  accessTokenExpiresAt Int?     @map("expires_at")
+  scope                String?
+  idToken              String?  @map("id_token") @db.Text
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -56,16 +57,16 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  token        String   @unique
-  userId       String
-  expiresAt    DateTime
-  ipAddress    String?
-  userAgent    String?
+  id             String   @id @default(cuid())
+  token          String   @unique
+  userId         String
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
   impersonatedBy String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
@@ -114,91 +115,92 @@ enum MaintenanceType {
 }
 
 model Vehicle {
-  id            String       @id @default(cuid())
-  chassi        String       @unique
-  renavam       String       @unique
-  placa         String       @unique
-  type          VehicleType
-  make          String
-  model         String
-  year          Int
-  color         String
-  fuelType      FuelType
-  department    Department
-  currentKM     Float
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id         String      @id @default(cuid())
+  chassi     String      @unique
+  renavam    String      @unique
+  placa      String      @unique
+  type       VehicleType
+  make       String
+  model      String
+  year       Int
+  color      String
+  fuelType   FuelType
+  department Department
+  currentKM  Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
-  refuels       Refuel[]
-  maintenances  Maintenance[]
-  fines         Fine[]
-  revisions     Revision[]
+  refuels      Refuel[]
+  maintenances Maintenance[]
+  fines        Fine[]
+  revisions    Revision[]
 
   @@map("vehicle")
 }
 
 model Driver {
-  id            String    @id @default(cuid())
-  userId        String?   @unique
-  user          User?     @relation(fields: [userId], references: [id])
-  name          String
-  cnh           String    @unique
-  category      String
-  validity      DateTime
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String?  @unique
+  user      User?    @relation(fields: [userId], references: [id])
+  name      String
+  cnh       String   @unique
+  category  String
+  validity  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   refuels       Refuel[]
   studentUsages StudentUsage[]
+  routes        Route[]
 
   @@map("driver")
 }
 
 model Refuel {
-  id            String    @id @default(cuid())
-  vehicleId     String
-  driverId      String
-  date          DateTime
-  station       String
-  fuelType      FuelType
-  liters        Float
-  totalValue    Float
-  currentKM     Float
-  createdAt     DateTime  @default(now())
+  id         String   @id @default(cuid())
+  vehicleId  String
+  driverId   String
+  date       DateTime
+  station    String
+  fuelType   FuelType
+  liters     Float
+  totalValue Float
+  currentKM  Float
+  createdAt  DateTime @default(now())
 
-  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
-  driver        Driver    @relation(fields: [driverId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  driver  Driver  @relation(fields: [driverId], references: [id])
 
   @@map("refuel")
 }
 
 model Maintenance {
-  id            String          @id @default(cuid())
-  vehicleId     String
-  type          MaintenanceType
-  partValue     Float
-  partType      String
-  date          DateTime
-  time          String
-  technician    String
-  description   String          @db.Text
-  createdAt     DateTime        @default(now())
+  id          String          @id @default(cuid())
+  vehicleId   String
+  type        MaintenanceType
+  partValue   Float
+  partType    String
+  date        DateTime
+  time        String
+  technician  String
+  description String          @db.Text
+  createdAt   DateTime        @default(now())
 
-  vehicle       Vehicle         @relation(fields: [vehicleId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
 
   @@map("maintenance")
 }
 
 model Part {
-  id          String   @id @default(cuid())
-  name        String
-  category    String
-  stock       Int      @default(0)
-  minStock    Int      @default(5)
-  unitValue   Float
-  provider    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  stock     Int      @default(0)
+  minStock  Int      @default(5)
+  unitValue Float
+  provider  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("part")
 }
@@ -212,7 +214,7 @@ model Fine {
   status      String   @default("PENDENTE") // PENDENTE, PAGO, CANCELADO
   createdAt   DateTime @default(now())
 
-  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
 
   @@map("fine")
 }
@@ -225,7 +227,7 @@ model Revision {
   completed     Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
 
   @@map("revision")
 }
@@ -233,29 +235,29 @@ model Revision {
 // --- Sicontrola Student Models ---
 
 model Student {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  cpf             String   @unique
+  id              String         @id @default(cuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id])
+  cpf             String         @unique
   birthDate       DateTime
   phone           String
   address         String
   bairro          String
   schoolId        String?
-  school          School?  @relation(fields: [schoolId], references: [id])
+  school          School?        @relation(fields: [schoolId], references: [id])
   course          String?
-  period          String?  // MANHA, TARDE, NOITE
+  period          String? // MANHA, TARDE, NOITE
   schoolYear      String?
   planId          String?
-  plan            Plan?    @relation(fields: [planId], references: [id])
-  status          StudentStatus @default(PENDENTE)
+  plan            Plan?          @relation(fields: [planId], references: [id])
+  status          StudentStatus  @default(PENDENTE)
   rejectionReason String?
   documents       Document[]
   payments        Payment[]
   usages          StudentUsage[]
-  qrCode          String?  @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  qrCode          String?        @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@map("student")
 }
@@ -272,7 +274,7 @@ model Document {
   id        String   @id @default(cuid())
   studentId String
   student   Student  @relation(fields: [studentId], references: [id])
-  type      String   // FOTO, DECLARACAO, RESIDENCIA, RG_CPF
+  type      String // FOTO, DECLARACAO, RESIDENCIA, RG_CPF
   url       String
   createdAt DateTime @default(now())
 
@@ -280,25 +282,27 @@ model Document {
 }
 
 model Plan {
-  id            String   @id @default(cuid())
-  name          String
-  price         Float
-  usesPerWeek   Int
-  students      Student[]
+  id          String    @id @default(cuid())
+  name        String
+  price       Float
+  usesPerWeek Int
+  description String?
+  students    Student[]
 
   @@map("plan")
 }
 
 model Payment {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [id])
-  amount      Float
-  dueDate     DateTime
-  paidDate    DateTime?
-  status      PaymentStatus @default(PENDENTE)
-  method      String? // PIX, BOLETO
-  createdAt   DateTime @default(now())
+  id            String        @id @default(cuid())
+  studentId     String
+  student       Student       @relation(fields: [studentId], references: [id])
+  amount        Float
+  dueDate       DateTime
+  paidDate      DateTime?
+  status        PaymentStatus @default(PENDENTE)
+  method        String? // PIX, BOLETO, STRIPE, MERCADOPAGO
+  transactionId String?
+  createdAt     DateTime      @default(now())
 
   @@map("payment")
 }
@@ -310,18 +314,22 @@ enum PaymentStatus {
 }
 
 model School {
-  id       String   @id @default(cuid())
+  id       String    @id @default(cuid())
   name     String
+  address  String    @default("")
   students Student[]
 
   @@map("school")
 }
 
 model Route {
-  id            String @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String
   origin        String
   destination   String
+  description   String?
+  driverId      String?
+  driver        Driver?        @relation(fields: [driverId], references: [id])
   studentUsages StudentUsage[]
 
   @@map("route")
@@ -340,4 +348,37 @@ model StudentUsage {
   @@map("student_usage")
 }
 
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String           @db.Text
+  type      NotificationType @default(INFO)
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
 
+  @@map("notification")
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model SystemSettings {
+  id              String   @id @default("default")
+  systemName      String   @default("Sicontrola")
+  contactEmail    String   @default("")
+  dueDay          Int      @default(10)
+  gracePeriodDays Int      @default(5)
+  blockOnOverdue  Boolean  @default(true)
+  blockOnExpired  Boolean  @default(false)
+  weekResetDay    String   @default("monday")
+  inactivityDays  Int      @default(30)
+  updatedAt       DateTime @updatedAt
+
+  @@map("system_settings")
+}

@@ -1,4 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sicontrola — Frontend
+
+Interface web do sistema Sicontrola, construída com **Next.js 16** (App Router), **Tailwind CSS v4** e **shadcn/ui**.
+
+---
+
+## Stack
+
+- **Framework**: Next.js 16 (App Router, Standalone output)
+- **Estilo**: Tailwind CSS v4 + shadcn/ui (Radix UI)
+- **Autenticação**: Better-Auth React Client (sessões gerenciadas pelo backend)
+- **Tabelas**: TanStack Table v8
+- **Gráficos**: Recharts
+- **Forms**: React Hook Form + Zod
+- **Pagamentos**: Stripe.js (checkout no lado do cliente)
+- **Estado**: React Context + useReducer
+
+> O frontend **não tem banco de dados**. Toda persistência é feita pelo backend via API REST.
+
+---
+
+## Variáveis de Ambiente
+
+| Variável              | Padrão                  | Descrição                                           |
+| --------------------- | ----------------------- | --------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | URL da API backend                                  |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | URL pública deste app (usada pelo auth client)      |
+| `STRIPE_SECRET_KEY`   | —                       | Chave secreta Stripe (para API routes de pagamento) |
+
+---
+
+## Desenvolvimento local
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend disponível em **http://localhost:3000**.
+
+O backend deve estar rodando em **http://localhost:4000**. Para subir tudo junto:
+
+```bash
+docker compose -f ../docker-compose.dev.yaml up
+```
+
+---
+
+## Build de produção
+
+```bash
+npm run build
+```
+
+Gera saída **standalone** em `.next/standalone/`. Para rodar:
+
+```bash
+node .next/standalone/server.js
+```
+
+---
+
+## Autenticação
+
+O auth é tratado pelo backend (NestJS + Better-Auth). O frontend usa o Better-Auth React Client que aponta para `/api/auth/**` — essas rotas são proxiadas para o backend via `src/app/api/auth/[...all]/route.ts`.
+
+```
+Browser → Next.js /api/auth/** → Backend /api/auth/**
+```
+
+Não há Prisma nem conexão direta com banco no frontend.
+
+---
+
+## Estrutura principal
+
+```
+src/
+├── app/               # Rotas (App Router)
+│   ├── api/           # API Routes (proxy auth, pagamentos)
+│   ├── login/         # Tela de login
+│   ├── dashboard/     # Dashboard principal
+│   ├── estudantil/    # Área do aluno
+│   ├── motoristas/    # Gestão de motoristas
+│   ├── manutencoes/   # Manutenções de frota
+│   └── ...
+├── components/        # Componentes compartilhados (shadcn/ui)
+└── lib/
+    ├── auth-client.ts # Cliente Better-Auth
+    ├── mock-data.ts   # Dados de exemplo (desenvolvimento)
+    ├── types.ts       # Tipos TypeScript
+    └── utils.ts       # Utilitários
+```
+
+---
+
+## Deploy no Coolify
+
+O `Dockerfile` usa build **multi-stage**:
+1. Stage `builder`: instala dependências e executa `next build`
+2. Stage `runner`: copia apenas a saída standalone + assets estáticos
+
+As variáveis `NEXT_PUBLIC_API_URL` e `NEXT_PUBLIC_APP_URL` são injetadas como `ARG` no Dockerfile para que o Next.js as incorpore no bundle de produção.
+
 
 ## Getting Started
 
