@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Bus,
   Mail,
@@ -14,105 +14,144 @@ import {
   LogIn,
   Loader2,
   AlertCircle,
-} from 'lucide-react'
-import { signIn, signUp } from '@/lib/auth-client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
+} from "lucide-react";
+import { signIn, signUp } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const demoUsers = [
-  { email: 'admin@sicontrola.gov.br', password: 'admin123', name: 'Administrador', icon: Shield, color: 'bg-red-100 text-red-700 hover:bg-red-200 border-red-200' },
-  { email: 'secretaria@sicontrola.gov.br', password: 'secretaria123', name: 'Secretaria', icon: FileText, color: 'bg-amber-100 text-amber-700 hover:bg-amber-200 border-amber-200' },
-  { email: 'ana.clara@email.com', password: 'aluno123', name: 'Aluno', icon: GraduationCap, color: 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200' },
-  { email: 'carlos.motorista@sicontrola.gov.br', password: 'motorista123', name: 'Motorista', icon: Truck, color: 'bg-sky-100 text-sky-700 hover:bg-sky-200 border-sky-200' },
-]
+  {
+    email: "admin@sicontrola.com.br",
+    password: "admin123",
+    name: "Administrador",
+    icon: Shield,
+    color: "bg-red-100 text-red-700 hover:bg-red-200 border-red-200",
+  },
+  {
+    email: "secretaria@sicontrola.com.br",
+    password: "secretaria123",
+    name: "Secretaria",
+    icon: FileText,
+    color: "bg-amber-100 text-amber-700 hover:bg-amber-200 border-amber-200",
+  },
+  {
+    email: "aluno@sicontrola.com.br",
+    password: "aluno123",
+    name: "Aluno Demo",
+    icon: GraduationCap,
+    color: "bg-green-100 text-green-700 hover:bg-green-200 border-green-200",
+  },
+  {
+    email: "motorista@sicontrola.com.br",
+    password: "motorista123",
+    name: "Motorista Demo",
+    icon: Truck,
+    color: "bg-sky-100 text-sky-700 hover:bg-sky-200 border-sky-200",
+  },
+];
 
 export default function LoginView() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       // Try sign in first
-      const result = await signIn.email({ email, password })
+      const result = await signIn.email({ email, password });
 
       if (result.error) {
         // If account doesn't exist, try to sign up (auto-create for demo)
-        if (result.error.message?.includes('Invalid') || result.error.code === 'INVALID_CREDENTIALS') {
+        if (
+          result.error.message?.includes("Invalid") ||
+          result.error.code === "INVALID_CREDENTIALS"
+        ) {
           // Attempt sign-up as fallback for demo users
           const signUpResult = await signUp.email({
             email,
             password,
-            name: email.split('@')[0],
-          })
+            name: email.split("@")[0],
+          });
 
           if (signUpResult.error) {
-            setError('Credenciais invalidas. Verifique seu e-mail e senha.')
+            setError("Credenciais invalidas. Verifique seu e-mail e senha.");
           } else {
             // Sign up succeeded, now sign in
-            const loginResult = await signIn.email({ email, password })
+            const loginResult = await signIn.email({ email, password });
             if (loginResult.error) {
-              setError('Erro ao fazer login. Tente novamente.')
+              setError("Erro ao fazer login. Tente novamente.");
             } else {
-              window.location.href = '/'
+              window.location.href = "/";
             }
           }
         } else {
-          setError('Credenciais invalidas. Verifique seu e-mail e senha.')
+          setError("Credenciais invalidas. Verifique seu e-mail e senha.");
         }
       } else {
-        window.location.href = '/'
+        window.location.href = "/";
       }
     } catch {
-      setError('Erro de conexao. Tente novamente.')
+      setError("Erro de conexao. Tente novamente.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleDemoLogin(demoEmail: string, demoPassword: string) {
-    setEmail(demoEmail)
-    setPassword(demoPassword)
-    setError('')
-    setLoading(true)
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError("");
+    setLoading(true);
 
     try {
-      const result = await signIn.email({ email: demoEmail, password: demoPassword })
+      const result = await signIn.email({
+        email: demoEmail,
+        password: demoPassword,
+      });
 
       if (result.error) {
         // Try sign-up first for auto-create
         const signUpResult = await signUp.email({
           email: demoEmail,
           password: demoPassword,
-          name: demoEmail.split('@')[0],
-        })
+          name: demoEmail.split("@")[0],
+        });
 
         if (signUpResult.error) {
-          setError('Nao foi possivel criar a conta de demonstracao.')
+          setError("Nao foi possivel criar a conta de demonstracao.");
         } else {
-          const loginResult = await signIn.email({ email: demoEmail, password: demoPassword })
+          const loginResult = await signIn.email({
+            email: demoEmail,
+            password: demoPassword,
+          });
           if (loginResult.error) {
-            setError('Erro ao fazer login. Tente novamente.')
+            setError("Erro ao fazer login. Tente novamente.");
           } else {
-            window.location.href = '/'
+            window.location.href = "/";
           }
         }
       } else {
-        window.location.href = '/'
+        window.location.href = "/";
       }
     } catch {
-      setError('Erro de conexao. Tente novamente.')
+      setError("Erro de conexao. Tente novamente.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -150,8 +189,8 @@ export default function LoginView() {
           </p>
           <div className="w-16 h-0.5 bg-blue-400/50 mx-auto mb-6" />
           <p className="text-blue-100/70 text-sm leading-relaxed">
-            Plataforma integrada para gestao de transporte estudantil,
-            controle de embarques, financeiro e carteirinhas digitais.
+            Plataforma integrada para gestao de transporte estudantil, controle
+            de embarques, financeiro e carteirinhas digitais.
           </p>
         </div>
 
@@ -168,7 +207,9 @@ export default function LoginView() {
             <Bus className="w-8 h-8 text-blue-300" />
           </div>
           <h1 className="text-2xl font-bold text-[#1e3a5f]">SICONTROLA</h1>
-          <p className="text-xs text-slate-400 mt-1">Transporte Estudantil Municipal</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Transporte Estudantil Municipal
+          </p>
         </div>
 
         <Card className="w-full max-w-md border-0 shadow-none lg:shadow-sm">
@@ -190,7 +231,10 @@ export default function LoginView() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                <Label
+                  htmlFor="email"
+                  className="text-sm font-medium text-slate-700"
+                >
                   E-mail
                 </Label>
                 <div className="relative">
@@ -208,14 +252,17 @@ export default function LoginView() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium text-slate-700"
+                >
                   Senha
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -227,7 +274,11 @@ export default function LoginView() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -266,7 +317,7 @@ export default function LoginView() {
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {demoUsers.map((demo) => {
-                  const Icon = demo.icon
+                  const Icon = demo.icon;
                   return (
                     <Button
                       key={demo.email}
@@ -274,14 +325,14 @@ export default function LoginView() {
                       onClick={() => handleDemoLogin(demo.email, demo.password)}
                       disabled={loading}
                       className={cn(
-                        'h-auto py-3 px-3 flex flex-col items-center gap-1.5 border text-xs font-medium transition-all duration-200',
-                        demo.color
+                        "h-auto py-3 px-3 flex flex-col items-center gap-1.5 border text-xs font-medium transition-all duration-200",
+                        demo.color,
                       )}
                     >
                       <Icon className="w-5 h-5" />
                       <span>{demo.name}</span>
                     </Button>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -294,5 +345,5 @@ export default function LoginView() {
         </p>
       </div>
     </div>
-  )
+  );
 }
