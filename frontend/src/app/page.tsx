@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useSession } from '@/lib/auth-client'
-import { AppProvider } from '@/contexts/AppContext'
-import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
-import ViewRouter from '@/components/ViewRouter'
-import LoginView from '@/components/LoginView'
-import type { UserRole } from '@/lib/types'
+import { useSession } from "@/lib/auth-client";
+import { AppProvider } from "@/contexts/AppContext";
+import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import ViewRouter from "@/components/ViewRouter";
+import LoginView from "@/components/LoginView";
+import type { UserRole } from "@/lib/types";
 
 function AppShell({ userRole }: { userRole?: string }) {
   return (
-    <AppProvider initialRole={(userRole as UserRole) || 'student'}>
+    <AppProvider initialRole={(userRole as UserRole) || "student"}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <Sidebar />
         <div className="lg:pl-[280px] min-h-screen flex flex-col">
@@ -21,7 +21,8 @@ function AppShell({ userRole }: { userRole?: string }) {
           <footer className="border-t border-slate-200 dark:border-slate-800 px-4 lg:px-6 py-4 mt-auto">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
               <p className="text-xs text-slate-400 dark:text-slate-500">
-                &copy; 2025 SICONTROLA — Sistema de Controle de Transporte Estudantil Municipal
+                &copy; 2025 SICONTROLA — Sistema de Controle de Transporte
+                Estudantil Municipal
               </p>
               <p className="text-xs text-slate-400 dark:text-slate-500">
                 Prefeitura Municipal — Todos os direitos reservados
@@ -31,11 +32,11 @@ function AppShell({ userRole }: { userRole?: string }) {
         </div>
       </div>
     </AppProvider>
-  )
+  );
 }
 
 export default function Home() {
-  const { data: session, isPending } = useSession()
+  const { data: session, isPending } = useSession();
 
   if (isPending) {
     return (
@@ -45,14 +46,24 @@ export default function Home() {
           <p className="text-slate-500 text-sm">Carregando...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return <LoginView />
+    return <LoginView />;
   }
 
-  const userRole = (session.user as Record<string, unknown>)?.role as string || 'student'
+  const roleMap: Record<string, UserRole> = {
+    ADMIN: "admin",
+    SECRETARIA: "secretary",
+    ALUNO: "student",
+    MOTORISTA: "driver",
+  };
 
-  return <AppShell userRole={userRole} />
+  const rawRole =
+    ((session.user as Record<string, unknown>)?.role as string) || "";
+  const userRole: UserRole =
+    roleMap[rawRole] || roleMap[rawRole?.toUpperCase()] || "student";
+
+  return <AppShell userRole={userRole} />;
 }
