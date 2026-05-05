@@ -45,7 +45,7 @@ services:
       dockerfile: Dockerfile
     container_name: sicontrola_web
     environment:
-      - NEXT_PUBLIC_API_URL=https://sicontrola.com.br
+      - API_URL=https://api.sicontrola.com.br
       - BETTER_AUTH_URL=https://sicontrola.com.br
     ports:
       - "7001:3000"

@@ -47,7 +47,7 @@ services:
     working_dir: /app
     command: sh -c "npm install && npm run dev"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:7000
+      - API_URL=http://backend:4000
       - BETTER_AUTH_URL=http://localhost:7000
     ports:
       - "7001:3000"
